@@ -41,3 +41,19 @@ bool decode_custom_packet(const uint8_t* data, uint8_t len, char* out, uint8_t o
 
     return true;
 }
+
+void encode_custom_packet(const char* msg, uint8_t* out, uint8_t* out_len) {
+    uint8_t msg_len = strlen(msg);
+    if(msg_len > 255) msg_len = 255;
+
+    out[0] = PROTOCOL_MAGIC_1;
+    out[1] = PROTOCOL_MAGIC_2;
+    out[2] = msg_len;
+
+    memcpy(&out[3], msg, msg_len);
+
+    uint8_t checksum = calc_checksum((const uint8_t*)msg, msg_len);
+    out[3 + msg_len] = checksum;
+
+    *out_len = 4 + msg_len;
+}
